@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Generator Laporan Perkembangan Santri</title>
+    <!-- Google Fonts: Inter untuk teks umum, Amiri untuk judul/sentuhan religius -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Variabel CSS untuk warna */
+        :root {
+            --color-primary: #2C5F2D; /* Hijau Tua */
+            --color-secondary: #97BF04; /* Hijau Limau */
+            --color-accent: #D4AF37; /* Emas */
+            --color-text-dark: #333;
+            --color-text-light: #fff;
+            --color-background-light: #F8F8F8;
+            --color-border: #ddd;
+            --color-table-header: #e0e0e0;
+            --color-table-stripe: #f9f9f9;
+            --color-form-bg: #ffffff;
+            --color-button-bg: #2C5F2D;
+            --color-button-hover: #3a7d3a;
+        }
+
+        /* Styling untuk body dan layout utama */
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5; /* Latar belakang abu-abu muda */
+            color: var(--color-text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling untuk kop surat */
+        .kop-surat {
+            background: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+            color: var(--color-text-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .kop-surat::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/><path d="M0,50 L100,50 M50,0 L50,100" stroke="rgba(255,255,255,0.1)" stroke-width="1"/></svg>');
+            background-size: 30px 30px;
+            opacity: 0.3;
+        }
+        .kop-surat .pesantren-info {
+            position: relative;
+            z-index: 1;
+        }
+        .kop-surat .pesantren-info h1 {
+            font-family: 'Amiri', serif;
+            font-size: 2.2em;
+            margin: 0;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        .kop-surat .pesantren-info p {
+            font-size: 0.85em;
+            margin: 5px 0;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Styling untuk header laporan */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .header h2 {
+            font-family: 'Amiri', serif;
+            font-size: 1.8em;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            border-bottom: 2px solid var(--color-secondary);
+            padding-bottom: 8px;
+            display: inline-block;
+        }
+        .header p {
+            font-size: 0.9em;
+            color: #555;
+            margin: 3px 0;
+        }
+
+        /* Styling untuk judul bagian */
+        h2 {
+            font-family: 'Amiri', serif;
+            color: var(--color-primary);
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 8px;
+            margin-top: 35px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 .fas, h2 .far {
+            color: var(--color-accent);
+            font-size: 1em;
+        }
+
+        /* Styling untuk tabel */
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-bottom: 25px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.08);
+        }
+        table th, table td {
+            border: 1px solid var(--color-border);
+            padding: 12px 15px;
+            text-align: left;
+            vertical-align: top;
+        }
+        table th {
+            background-color: var(--color-table-header);
+            color: var(--color-text-dark);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        table tr:nth-child(even) {
+            background-color: var(--color-table-stripe);
+        }
+        table tr:hover {
+            background-color: #e6ffe6;
+        }
+
+        /* Styling untuk bagian "Kepada" dan salam */
+        .kepada, .salam, .paragraph {
+            margin-bottom: 18px;
+            text-align: justify;
+        }
+        .kepada strong {
+            color: var(--color-primary);
+        }
+
+        /* Styling untuk daftar (ul) */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+        }
+        ul li {
+            background-color: #f0f0f0;
+            margin-bottom: 8px;
+            padding: 10px 15px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        ul li strong {
+            color: var(--color-primary);
+        }
+        ul li .fas {
+            color: var(--color-secondary);
+        }
+
+        /* Styling untuk pesan pribadi santri */
+        .santri-message {
+            border: 2px dashed var(--color-accent);
+            padding: 20px;
+            margin-top: 25px;
+            font-style: italic;
+            background-color: #fffaf0;
+            border-radius: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .santri-message::before {
+            content: "\f10d";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 2em;
+            color: rgba(212, 175, 55, 0.3);
+        }
+        .santri-message p {
+            margin: 0;
+            padding-left: 30px;
+            font-size: 0.95em;
+        }
+
+        /* Styling untuk tanda tangan */
+        .signature {
+            margin-top: 60px;
+            text-align: right;
+            line-height: 1.4;
+        }
+        .signature p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+        .signature strong {
+            color: var(--color-primary);
+            font-size: 1.1em;
+        }
+
+        /* Styling untuk bagian tips tambahan */
+        .tips {
+            margin-top: 50px;
+            border-top: 1px solid var(--color-border);
+            padding-top: 25px;
+            background-color: #f0f5f0;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.05);
+        }
+        .tips h2 {
+            color: var(--color-primary);
+            border-bottom: none;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .tips ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .tips ul li {
+            background-color: transparent;
+            box-shadow: none;
+            padding: 5px 0;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            font-size: 0.9em;
+        }
+        .tips ul li::before {
+            content: "\f00c";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            color: var(--color-secondary);
+            margin-top: 2px;
+            font-size: 0.9em;
+        }
+
+        /* Styling untuk Form Input */
+        .input-section {
+            background-color: var(--color-form-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+        .input-group input[type="text"],
+        .input-group input[type="number"],
+        .input-group textarea,
+        .input-group select {
+            width: calc(100% - 22px); /* Kurangi padding dan border */
+            padding: 10px;
+            border: 1px solid var(--color-border);
+            border-radius: 5px;
+            font-size: 1em;
+            box-sizing: border-box; /* Pastikan padding dan border termasuk dalam lebar */
+        }
+        .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .input-group input[type="number"] {
+            width: 100px; /* Lebar khusus untuk angka */
+        }
+
+        .table-input-container {
+            margin-bottom: 20px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .table-input-container h3 {
+            background-color: var(--color-table-header);
+            padding: 10px 15px;
+            margin: 0;
+            color: var(--color-primary);
+            font-size: 1.1em;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .table-input-body {
+            padding: 15px;
+        }
+        .table-input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        .table-input-row input, .table-input-row select, .table-input-row textarea {
+            flex: 1;
+        }
+        .table-input-row button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+        .table-input-row button:hover {
+            background-color: #c82333;
+        }
+        .add-row-button {
+            background-color: var(--color-secondary);
+            color: var(--color-text-light);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        .add-row-button:hover {
+            background-color: #7aa303;
+        }
+
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .button-group button {
+            background-color: var(--color-button-bg);
+            color: var(--color-text-light);
+            border: none;
+            padding: 12px 25px;
+            margin: 0 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button-group button:hover {
+            background-color: var(--color-button-hover);
+            transform: translateY(-2px);
+        }
+        .button-group button:active {
+            transform: translateY(0);
+        }
+
+        /* Styling untuk area laporan yang dihasilkan */
+        #generatedReport {
+            display: none; /* Sembunyikan secara default */
+            margin-top: 40px;
+            padding: 30px;
+            background-color: var(--color-form-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Media queries untuk responsivitas */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                margin: 10px auto;
+                padding: 15px;
+            }
+            .kop-surat .pesantren-info h1 {
+                font-size: 1.5em;
+            }
+            .header h2 {
+                font-size: 1.4em;
+            }
+            table th, table td {
+                padding: 8px 10px;
+                font-size: 0.9em;
+            }
+            .table-input-row {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .table-input-row input, .table-input-row select, .table-input-row textarea {
+                width: 100%;
+            }
+            .button-group button {
+                width: 100%;
+                margin: 10px 0;
+            }
+        }
+
+        /* Styling khusus untuk mode cetak */
+        @media print {
+            body {
+                background-color: #fff;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: none;
+            }
+            .container {
+                box-shadow: none;
+                border-radius: 0;
+                padding: 0;
+                margin: 0;
+            }
+            .input-section, .button-group {
+                display: none; /* Sembunyikan form input dan tombol saat mencetak */
+            }
+            #generatedReport {
+                display: block !important; /* Pastikan laporan terlihat saat mencetak */
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+            }
+            .kop-surat {
+                background: none; /* Hapus gradien untuk cetak */
+                color: #333;
+                border-bottom: 3px solid #000;
+                box-shadow: none;
+                border-radius: 0;
+            }
+            .kop-surat::before {
+                display: none; /* Hapus pola latar belakang */
+            }
+            .kop-surat .pesantren-info h1,
+            .kop-surat .pesantren-info p {
+                color: #333; /* Pastikan teks berwarna gelap */
+                text-shadow: none;
+            }
+            h2 .fas, h2 .far, .tips ul li::before {
+                color: #555 !important; /* Warna ikon lebih netral untuk cetak */
+            }
+            table {
+                box-shadow: none;
+            }
+            table th {
+                background-color: #f2f2f2 !important;
+                -webkit-print-color-adjust: exact; /* Pastikan warna latar belakang tercetak */
+                color-adjust: exact;
+            }
+            table tr:nth-child(even) {
+                background-color: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .santri-message {
+                background-color: #fffaf0 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .tips {
+                background-color: #f0f5f0 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Bagian Kop Surat (tetap statis) -->
+        <div class="kop-surat">
+            <div class="pesantren-info">
+                <h1>PONDOK PESANTREN [NAMA PESANTREN]</h1>
+                <p>Alamat: [Alamat Lengkap Pesantren]</p>
+                <p>Telepon: [Nomor Telepon] | Email: [Alamat Email] | Website: [Website Pesantren]</p>
+            </div>
+        </div>
+
+        <!-- Bagian Form Input Data -->
+        <div class="input-section">
+            <h2 style="border-bottom: 2px solid var(--color-secondary); padding-bottom: 10px; margin-bottom: 30px;"><i class="fas fa-edit"></i> Input Data Laporan Santri</h2>
+
+            <div class="input-group">
+                <label for="namaDonatur">Nama Donatur:</label>
+                <input type="text" id="namaDonatur" value="[Nama Donatur]" placeholder="Masukkan Nama Donatur">
+            </div>
+
+            <h3><i class="fas fa-user-graduate"></i> Data Diri Santri</h3>
+            <div class="input-group">
+                <label for="namaLengkap">Nama Lengkap Santri:</label>
+                <input type="text" id="namaLengkap" value="Muhammad Al-Fatih" placeholder="Nama Lengkap Santri">
+            </div>
+            <div class="input-group">
+                <label for="nis">Nomor Induk Santri:</label>
+                <input type="text" id="nis" value="2024007" placeholder="Nomor Induk Santri">
+            </div>
+            <div class="input-group">
+                <label for="kelas">Kelas:</label>
+                <input type="text" id="kelas" value="VIII (Kelas 2 MTs)" placeholder="Kelas Santri">
+            </div>
+            <div class="input-group">
+                <label for="waliAsuh">Wali Asuh/Pembimbing:</label>
+                <input type="text" id="waliAsuh" value="Ustadz Abdullah, S.Pd.I" placeholder="Nama Wali Asuh/Pembimbing">
+            </div>
+
+            <h3><i class="fas fa-book-open"></i> Perkembangan Akademik (DIKNAS)</h3>
+            <div class="table-input-container">
+                <h3>Mata Pelajaran</h3>
+                <div id="akademikInputs" class="table-input-body">
+                    <!-- Contoh baris input akademik -->
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Mata Pelajaran" value="Bahasa Indonesia">
+                        <input type="number" placeholder="Nilai Rata-Rata" value="88">
+                        <input type="text" placeholder="Peringkat Kelas" value="5 dari 30">
+                        <textarea placeholder="Catatan Guru">Sangat aktif bertanya dan berdiskusi.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Mata Pelajaran" value="Matematika">
+                        <input type="number" placeholder="Nilai Rata-Rata" value="82">
+                        <input type="text" placeholder="Peringkat Kelas" value="10 dari 30">
+                        <textarea placeholder="Catatan Guru">Membutuhkan latihan lebih pada soal cerita.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Mata Pelajaran" value="Ilmu Pengetahuan Alam">
+                        <input type="number" placeholder="Nilai Rata-Rata" value="85">
+                        <input type="text" placeholder="Peringkat Kelas" value="7 dari 30">
+                        <textarea placeholder="Catatan Guru">Antusias dalam praktikum.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Mata Pelajaran" value="Bahasa Inggris">
+                        <input type="number" placeholder="Nilai Rata-Rata" value="80">
+                        <input type="text" placeholder="Peringkat Kelas" value="12 dari 30">
+                        <textarea placeholder="Catatan Guru">Perlu meningkatkan kepercayaan diri dalam berbicara.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                </div>
+                <button class="add-row-button" onclick="addAkademikRow()">Tambah Baris Akademik</button>
+            </div>
+
+            <h3><i class="fas fa-mosque"></i> Perkembangan Diniyah (Keagamaan)</h3>
+            <div class="table-input-container">
+                <h3>Bidang Evaluasi Diniyah</h3>
+                <div id="diniyahInputs" class="table-input-body">
+                    <!-- Contoh baris input diniyah -->
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Bidang Evaluasi" value="Tahfidz Al-Qur'an">
+                        <input type="text" placeholder="Target Semester Ini" value="Hafal Juz 29">
+                        <input type="text" placeholder="Pencapaian" value="Selesai Juz 29 & 30">
+                        <textarea placeholder="Catatan Pembimbing">Alhamdulillah, melampaui target. Bacaan tartil dan makhraj baik.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Bidang Evaluasi" value="Hadits">
+                        <input type="text" placeholder="Target Semester Ini" value="Hafal 20 Hadits Arbain">
+                        <input type="text" placeholder="Pencapaian" value="Hafal 25 Hadits Arbain">
+                        <textarea placeholder="Catatan Pembimbing">Sangat bersemangat dan mampu menjelaskan makna hadits.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Bidang Evaluasi" value="Aqidah Akhlak">
+                        <input type="text" placeholder="Target Semester Ini" value="Memahami Sifat Wajib Allah">
+                        <input type="text" placeholder="Pencapaian" value="Sangat Paham">
+                        <textarea placeholder="Catatan Pembimbing">Mampu menerapkan akhlak terpuji dalam keseharian.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Bidang Evaluasi" value="Fiqih Ibadah">
+                        <input type="text" placeholder="Target Semester Ini" value="Praktik Shalat Jenazah">
+                        <input type="text" placeholder="Pencapaian" value="Menguasai dengan Baik">
+                        <textarea placeholder="Catatan Pembimbing">Sering menjadi imam saat latihan praktik di kelas.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Bidang Evaluasi" value="Bahasa Arab">
+                        <input type="text" placeholder="Target Semester Ini" value="Menguasai Mubtada-Khabar">
+                        <input type="text" placeholder="Pencapaian" value="Sangat Menguasai">
+                        <textarea placeholder="Catatan Pembimbing">Aktif menggunakan Bahasa Arab dalam percakapan harian.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                </div>
+                <button class="add-row-button" onclick="addDiniyahRow()">Tambah Baris Diniyah</button>
+            </div>
+
+            <h3><i class="fas fa-child"></i> Aspek Kepribadian dan Ibadah Harian</h3>
+            <div class="table-input-container">
+                <h3>Aspek Penilaian</h3>
+                <div id="kepribadianInputs" class="table-input-body">
+                    <!-- Contoh baris input kepribadian -->
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Aspek Penilaian" value="Kedisiplinan">
+                        <textarea placeholder="Keterangan">Sangat Baik. Selalu tepat waktu shalat berjamaah dan piket.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Aspek Penilaian" value="Ibadah Wajib & Sunnah">
+                        <textarea placeholder="Keterangan">Selalu menjaga shalat 5 waktu berjamaah, rajin shalat Dhuha.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Aspek Penilaian" value="Sosialisasi">
+                        <textarea placeholder="Keterangan">Mudah bergaul, disenangi teman-temannya, dan suka menolong.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Aspek Penilaian" value="Tanggung Jawab">
+                        <textarea placeholder="Keterangan">Amanah dalam menjalankan tugas sebagai ketua kamar.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="table-input-row">
+                        <input type="text" placeholder="Aspek Penilaian" value="Kesehatan">
+                        <textarea placeholder="Keterangan">Sehat wal'afiat, tidak ada catatan sakit yang serius.</textarea>
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                </div>
+                <button class="add-row-button" onclick="addKepribadianRow()">Tambah Baris Kepribadian</button>
+            </div>
+
+            <h3><i class="fas fa-running"></i> Kegiatan Ekstrakurikuler</h3>
+            <div class="table-input-container">
+                <h3>Daftar Kegiatan</h3>
+                <div id="ekskulInputs" class="table-input-body">
+                    <!-- Contoh baris input ekskul -->
+                    <div class="input-group">
+                        <input type="text" placeholder="Nama Kegiatan: Keterangan" value="Pramuka: Aktif sebagai pemimpin regu.">
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" placeholder="Nama Kegiatan: Keterangan" value="Klub Pidato (Muhadharah): Juara 2 lomba pidato antar kelas.">
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" placeholder="Nama Kegiatan: Keterangan" value="Marawis: Anggota aktif.">
+                        <button onclick="removeRow(this)">Hapus</button>
+                    </div>
+                </div>
+                <button class="add-row-button" onclick="addEkskulRow()">Tambah Kegiatan Ekstrakurikuler</button>
+            </div>
+
+            <h3><i class="fas fa-chalkboard-teacher"></i> Catatan Umum dari Wali Asuh/Pembimbing</h3>
+            <div class="input-group">
+                <textarea id="catatanWaliAsuh" placeholder="Catatan umum dari wali asuh/pembimbing">Alhamdulillah, ananda Muhammad Al-Fatih menunjukkan perkembangan yang sangat positif di semester ini, baik dari sisi akademik maupun keagamaan. Ia adalah anak yang cerdas, rajin, dan memiliki akhlak yang baik. Semangatnya dalam menghafal Al-Qur'an patut diacungi jempol. Terima kasih atas dukungan Bapak/Ibu yang sangat berarti bagi masa depan ananda. Mohon doanya agar ananda tetap istiqomah.</textarea>
+            </div>
+
+            <h3><i class="fas fa-hand-holding-heart"></i> Pesan Pribadi dari Santri</h3>
+            <div class="input-group">
+                <textarea id="pesanSantri" placeholder="Pesan pribadi dari santri">Assalamu'alaikum, Bapak Donatur. Semoga Bapak sekeluarga selalu sehat. Alhamdulillah, berkat bantuan Bapak, saya bisa terus belajar di pesantren. Semester ini saya sudah hafal Juz 29 dan 30. Doakan saya agar bisa menjadi hafidz Qur'an dan membanggakan Bapak serta orang tua saya. Terima kasih banyak, Pak. Wassalam, (Muhammad Al-Fatih)</textarea>
+            </div>
+
+            <div class="button-group">
+                <button onclick="generateReport()"><i class="fas fa-file-alt"></i> Buat Laporan</button>
+                <button onclick="printReport()" disabled id="printButton"><i class="fas fa-print"></i> Cetak Laporan (PDF)</button>
+            </div>
+        </div>
+
+        <!-- Area untuk menampilkan laporan yang dihasilkan -->
+        <div id="generatedReport">
+            <!-- Konten laporan akan dimasukkan di sini oleh JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        // Fungsi untuk menambahkan baris input akademik
+        function addAkademikRow() {
+            const container = document.getElementById('akademikInputs');
+            const newRow = document.createElement('div');
+            newRow.className = 'table-input-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Mata Pelajaran">
+                <input type="number" placeholder="Nilai Rata-Rata">
+                <input type="text" placeholder="Peringkat Kelas">
+                <textarea placeholder="Catatan Guru"></textarea>
+                <button onclick="removeRow(this)">Hapus</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Fungsi untuk menambahkan baris input diniyah
+        function addDiniyahRow() {
+            const container = document.getElementById('diniyahInputs');
+            const newRow = document.createElement('div');
+            newRow.className = 'table-input-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Bidang Evaluasi">
+                <input type="text" placeholder="Target Semester Ini">
+                <input type="text" placeholder="Pencapaian">
+                <textarea placeholder="Catatan Pembimbing"></textarea>
+                <button onclick="removeRow(this)">Hapus</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Fungsi untuk menambahkan baris input kepribadian
+        function addKepribadianRow() {
+            const container = document.getElementById('kepribadianInputs');
+            const newRow = document.createElement('div');
+            newRow.className = 'table-input-row';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Aspek Penilaian">
+                <textarea placeholder="Keterangan"></textarea>
+                <button onclick="removeRow(this)">Hapus</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Fungsi untuk menambahkan baris input ekstrakurikuler
+        function addEkskulRow() {
+            const container = document.getElementById('ekskulInputs');
+            const newRow = document.createElement('div');
+            newRow.className = 'input-group';
+            newRow.innerHTML = `
+                <input type="text" placeholder="Nama Kegiatan: Keterangan">
+                <button onclick="removeRow(this)">Hapus</button>
+            `;
+            container.appendChild(newRow);
+        }
+
+        // Fungsi untuk menghapus baris input
+        function removeRow(buttonElement) {
+            buttonElement.parentNode.remove();
+        }
+
+        // Fungsi utama untuk menghasilkan laporan HTML
+        function generateReport() {
+            const namaDonatur = document.getElementById('namaDonatur').value;
+            const namaLengkap = document.getElementById('namaLengkap').value;
+            const nis = document.getElementById('nis').value;
+            const kelas = document.getElementById('kelas').value;
+            const waliAsuh = document.getElementById('waliAsuh').value;
+            const catatanWaliAsuh = document.getElementById('catatanWaliAsuh').value;
+            const pesanSantri = document.getElementById('pesanSantri').value;
+
+            // Mengambil data akademik
+            const akademikRows = document.querySelectorAll('#akademikInputs .table-input-row');
+            let akademikHtml = '';
+            akademikRows.forEach((row, index) => {
+                const inputs = row.querySelectorAll('input, textarea');
+                akademikHtml += `
+                    <tr>
+                        <td>${index + 1}.</td>
+                        <td>${inputs[0].value}</td>
+                        <td>${inputs[1].value} (${getGrade(inputs[1].value)})</td>
+                        <td>${inputs[2].value}</td>
+                        <td>${inputs[3].value}</td>
+                    </tr>
+                `;
+            });
+
+            // Mengambil data diniyah
+            const diniyahRows = document.querySelectorAll('#diniyahInputs .table-input-row');
+            let diniyahHtml = '';
+            diniyahRows.forEach(row => {
+                const inputs = row.querySelectorAll('input, textarea');
+                diniyahHtml += `
+                    <tr>
+                        <td>${inputs[0].value}</td>
+                        <td>${inputs[1].value}</td>
+                        <td>${inputs[2].value}</td>
+                        <td>${inputs[3].value}</td>
+                    </tr>
+                `;
+            });
+
+            // Mengambil data kepribadian
+            const kepribadianRows = document.querySelectorAll('#kepribadianInputs .table-input-row');
+            let kepribadianHtml = '';
+            kepribadianRows.forEach(row => {
+                const inputs = row.querySelectorAll('input, textarea');
+                kepribadianHtml += `
+                    <tr>
+                        <td>${inputs[0].value}</td>
+                        <td>${inputs[1].value}</td>
+                    </tr>
+                `;
+            });
+
+            // Mengambil data ekstrakurikuler
+            const ekskulInputs = document.querySelectorAll('#ekskulInputs input[type="text"]');
+            let ekskulHtml = '';
+            ekskulInputs.forEach(input => {
+                const parts = input.value.split(':');
+                const activityName = parts[0].trim();
+                const activityDesc = parts.slice(1).join(':').trim();
+                let icon = '';
+                // Menentukan ikon berdasarkan nama kegiatan
+                if (activityName.toLowerCase().includes('pramuka')) {
+                    icon = '<i class="fas fa-campground"></i>';
+                } else if (activityName.toLowerCase().includes('pidato') || activityName.toLowerCase().includes('muhadharah')) {
+                    icon = '<i class="fas fa-microphone-alt"></i>';
+                } else if (activityName.toLowerCase().includes('marawis')) {
+                    icon = '<i class="fas fa-drum"></i>';
+                } else {
+                    icon = '<i class="fas fa-star"></i>'; // Ikon default
+                }
+                ekskulHtml += `<li>${icon} <strong>${activityName}:</strong> ${activityDesc}</li>`;
+            });
+
+            // Fungsi pembantu untuk mendapatkan grade dari nilai
+            function getGrade(score) {
+                const s = parseInt(score);
+                if (s >= 90) return 'A+';
+                if (s >= 85) return 'A';
+                if (s >= 80) return 'B+';
+                if (s >= 75) return 'B';
+                if (s >= 70) return 'C+';
+                if (s >= 60) return 'C';
+                return 'D';
+            }
+
+            const generatedContent = `
+                <div class="header">
+                    <h2>LAPORAN PERKEMBANGAN SANTRI BINAAN</h2>
+                    <p><strong>Periode: Semester Ganjil (Juli - Desember 2024)</strong></p>
+                    <p>Nomor Laporan: 123/LP-Donatur/I/2025</p>
+                    <p>Tanggal: ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                </div>
+
+                <div class="kepada">
+                    <p>Yth. Bapak/Ibu/Donatur <strong>${namaDonatur}</strong></p>
+                    <p>di Tempat</p>
+                </div>
+
+                <p class="salam">Assalamu'alaikum Warahmatullahi Wabarakatuh,</p>
+
+                <p class="paragraph">Segala puji bagi Allah SWT yang telah melimpahkan rahmat dan karunia-Nya kepada kita semua. Shalawat serta salam semoga senantiasa tercurah kepada junjungan kita, Nabi Muhammad SAW.</p>
+
+                <p class="paragraph">Melalui surat ini, kami sampaikan laporan perkembangan ananda santri binaan yang berada di bawah dukungan Bapak/Ibu. Laporan ini merupakan bentuk transparansi dan pertanggungjawaban kami atas amanah yang telah dipercayakan.</p>
+
+                <p class="paragraph">Berikut adalah rincian perkembangan ananda:</p>
+
+                <h2><i class="fas fa-user-graduate"></i> A. DATA DIRI SANTRI</h2>
+                <table>
+                    <tr>
+                        <td style="width: 30%;">Nama Lengkap</td>
+                        <td>${namaLengkap}</td>
+                    </tr>
+                    <tr>
+                        <td>Nomor Induk Santri</td>
+                        <td>${nis}</td>
+                    </tr>
+                    <tr>
+                        <td>Kelas</td>
+                        <td>${kelas}</td>
+                    </tr>
+                    <tr>
+                        <td>Wali Asuh/Pembimbing</td>
+                        <td>${waliAsuh}</td>
+                    </tr>
+                </table>
+
+                <h2><i class="fas fa-book-open"></i> B. PERKEMBANGAN AKADEMIK (DIKNAS)</h2>
+                <p>Laporan ini mencakup nilai-nilai mata pelajaran formal yang diikuti santri.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Mata Pelajaran</th>
+                            <th>Nilai Rata-Rata</th>
+                            <th>Peringkat Kelas</th>
+                            <th>Catatan Guru</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${akademikHtml}
+                    </tbody>
+                </table>
+
+                <h2><i class="fas fa-mosque"></i> C. PERKEMBANGAN DINIYAH (KEAGAMAAN)</h2>
+                <p>Ini adalah bagian terpenting yang menunjukkan perkembangan keagamaan santri.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bidang Evaluasi</th>
+                            <th>Target Semester Ini</th>
+                            <th>Pencapaian</th>
+                            <th>Catatan Pembimbing (Ustadz)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${diniyahHtml}
+                    </tbody>
+                </table>
+
+                <h2><i class="fas fa-child"></i> D. ASPEK KEPRIBADIAN DAN IBADAH HARIAN</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspek Penilaian</th>
+                            <th>Keterangan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${kepribadianHtml}
+                    </tbody>
+                </table>
+
+                <h2><i class="fas fa-running"></i> E. KEGIATAN EKSTRAKURIKULER</h2>
+                <ul>
+                    ${ekskulHtml}
+                </ul>
+
+                <h2><i class="fas fa-chalkboard-teacher"></i> F. CATATAN UMUM DARI WALI ASUH/PEMBIMBING</h2>
+                <p class="paragraph">"${catatanWaliAsuh}"</p>
+
+                <h2><i class="fas fa-hand-holding-heart"></i> G. PESAN PRIBADI DARI SANTRI</h2>
+                <p>(Disarankan untuk ditulis tangan oleh santri lalu difoto/scan dan dilampirkan)</p>
+                <div class="santri-message">
+                    <p>"${pesanSantri}"</p>
+                </div>
+
+                <p class="paragraph">Demikian laporan ini kami sampaikan. Atas perhatian, kepercayaan, dan dukungan yang Bapak/Ibu berikan, kami haturkan Jazakumullahu Khairan Katsiran. Semoga Allah SWT membalasnya dengan kebaikan yang berlipat ganda.</p>
+
+                <p class="salam">Wassalamu'alaikum Warahmatullahi Wabarakatuh.</p>
+
+                <div class="signature">
+                    <p>Hormat kami,</p>
+                    <p>Pimpinan Pondok Pesantren [Nama Pesantren]</p>
+                    <br><br><br>
+                    <p>(Tanda Tangan & Stempel)</p>
+                    <p><strong>[Nama Pimpinan Pesantren]</strong></p>
+                </div>
+
+                <div class="tips">
+                    <h2><i class="fas fa-lightbulb"></i> Tips Tambahan untuk Laporan Donatur:</h2>
+                    <ul>
+                        <li><strong>Sertakan Foto:</strong> Lampirkan foto terbaru santri (bisa foto formal atau foto saat berkegiatan). Ini memberikan sentuhan personal yang kuat.</li>
+                        <li><strong>Kirim Secara Rutin:</strong> Buat jadwal pengiriman laporan yang konsisten, misalnya setiap 3 bulan (triwulan) atau 6 bulan (semester).</li>
+                        <li><strong>Jujur dan Transparan:</strong> Jika santri memiliki kendala (misalnya sakit atau kesulitan dalam pelajaran), sampaikan dengan baik dan jelaskan langkah-langkah yang sedang ditempuh untuk membantunya. Ini justru akan membangun kepercayaan.</li>
+                        <li><strong>Ucapkan Terima Kasih dengan Tulus:</strong> Selalu awali dan akhiri laporan dengan ucapan terima kasih dan doa untuk donatur.</li>
+                        <li><strong>Gunakan Bahasa yang Baik:</strong> Gunakan bahasa yang formal, positif, dan mudah dipahami.</li>
+                    </ul>
+                    <p>Semoga contoh ini bermanfaat dan bisa disesuaikan untuk kebutuhan di tempat Anda.</p>
+                </div>
+            `;
+
+            const generatedReportDiv = document.getElementById('generatedReport');
+            generatedReportDiv.innerHTML = generatedContent;
+            generatedReportDiv.style.display = 'block'; // Tampilkan laporan
+            document.getElementById('printButton').disabled = false; // Aktifkan tombol cetak
+        }
+
+        // Fungsi untuk mencetak laporan
+        function printReport() {
+            window.print();
+        }
+    </script>
+
+</body>
+</html>
